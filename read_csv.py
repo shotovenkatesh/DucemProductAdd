@@ -2,12 +2,12 @@ import pandas as pd
 import csv
 
 
-df = pd.read_csv("vegan.csv")
+df = pd.read_csv("life.csv")
 # print(df)
 df['Name'] = df['Name'].str.title()
 df['Price'] = df['Price'].astype(float)
 increase_percentage = 20
-df['Price'] = df['Price'] * (1 + increase_percentage / 100)
+df['Price'] = df['Price'] * 1.25
 
 # df['Description'] = df['Description'].str.title()
 
@@ -16,6 +16,12 @@ data_dict = df.to_dict('records')
 names = [item['Name'] for item in data_dict]
 price = [item['Price'] for item in data_dict]
 meta_titles = [item['Name'] for item in data_dict]
+
+
+try:
+    description = [item['Description'] for item in data_dict]
+except KeyError:
+    description = ""
 
 
 try:
@@ -57,6 +63,13 @@ def get_categories():
 def get_weights():
     return weights
 
-print(names[0])
-print(type(names))
-print(len(names))
+def get_des():
+    return description
+
+#
+# print(names)
+# print(description)
+# print(price)
+# print(categories)
+# print(weights)
+# print(barcodes)

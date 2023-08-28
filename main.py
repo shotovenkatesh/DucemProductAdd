@@ -1,5 +1,7 @@
 import csv
-import read_from_csv
+import time
+import selenium
+import read_csv
 from slugify import slugify
 import chatgpt
 
@@ -11,7 +13,7 @@ row_list = [
      "Height", "Length Class", "Weight", "Weight Class", "Sort Order", "Reward Points", "Manufacturer", "Categories",
      "Filters", "Stores", "Downloads", "Related Products", "Meta Title"], ]
 
-with open(f'test.csv', 'w', newline='') as file:
+with open('test.csv', 'w', newline='') as file:
     writer = csv.writer(file)
     writer.writerows(row_list)
 
@@ -19,10 +21,10 @@ with open(f'test.csv', 'w', newline='') as file:
 # This should be changed
 #manufacturer is supplier name
 #location is company name
-MANUFACTURER = "Vegan Way"
-location = "Vegan Way"
-si_tag = "VW"
-date = "24/08/2023"
+MANUFACTURER = "Chocopaz"
+location = "Rumidimur DMCC"
+si_tag = "R"
+date = "28/08/2023"
 
 
 
@@ -41,14 +43,15 @@ date = "24/08/2023"
 # min_Quantity : ✅
 
 
-names = read_from_csv.get_names()
-price = read_from_csv.get_prices()
-barcodes = read_from_csv.get_barcodes()
-meta_titles = read_from_csv.get_meta_titles()
-categories = read_from_csv.get_categories()
+names = read_csv.get_names()
+price = read_csv.get_prices()
+barcodes = read_csv.get_barcodes()
+meta_titles = read_csv.get_meta_titles()
+categories = read_csv.get_categories()
+description = read_csv.get_des()
 si_number = [f"{si_tag}{num:03}" for num in range(0, len(names))]
 sort_number = [num for num in range(0, len(names))]
-weights = read_from_csv.get_weights()
+weights = read_csv.get_weights()
 TAX_CLASS = "Taxable Good"
 seo = [slugify(name) for name in names]
 
@@ -66,6 +69,7 @@ last_number = names
 while index != len(names):
     name_tw = names[index]
     price_tw = price[index]
+    barcode_tw = barcodes[index]
     meta_title_tw = meta_titles[index]
     si_number_tw = si_number[index]
     sort_number_tw = sort_number[index]
@@ -80,17 +84,24 @@ while index != len(names):
         barcode_tw = ""
     else:
         barcode_tw = barcodes[index]
+
     if categories == "":
-        category_tw = ""
+        category_tw = chatgpt.get_category(barcode_tw)
     else:
         category_tw = categories[index]
-    description = chatgpt.get_description(f"Give me a description about {MANUFACTURER}'s {name_tw}")
-    lines = description.split('\n')  # Split the sentence into lines using '\n' as the delimiter
+
+    if description == "":
+        description_tw = chatgpt.get_description(barcode_tw,name_tw)
+    else:
+        description_tw = description[index]
+
+
+    lines = description_tw.split('\n')  # Split the sentence into lines using '\n' as the delimiter
     meta_tag_tw = '\n'.join(lines[:2])
 
-    f = open(f'test.csv', 'a')
+    f = open('test.csv', 'a')
     writer = csv.writer(f)
-    row = ["", name_tw, si_number_tw, barcode_tw, description, meta_tag_tw, " ", " ", "", "", "", "", "", price_tw,
+    row = ["", name_tw, si_number_tw, barcode_tw, description_tw, meta_tag_tw, " ", " ", "", "", "", "", "", price_tw,
            location, "", TAX_CLASS,
            QUANTITY, MIN_QUANTITY, "", SUBTRACT_STOCK, "", "", seo_tw, date, "", "", "", "", weight_tw, "",
            sort_number_tw,
@@ -98,3 +109,4 @@ while index != len(names):
     writer.writerow(row)
     print(f"{name_tw} has been added to the csv")
     index += 1
+    time.sleep(2)
