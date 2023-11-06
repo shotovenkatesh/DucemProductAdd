@@ -1,9 +1,7 @@
 import csv
-import time
-import selenium
 import read_csv
 from slugify import slugify
-import chatgpt
+from unidecode import unidecode
 
 row_list = [
     ["Product ID", "Name", "Model", "SKU", "Description", "Meta Tag Description", "Meta Tag Keywords", "Tags", "UPC",
@@ -13,20 +11,18 @@ row_list = [
      "Height", "Length Class", "Weight", "Weight Class", "Sort Order", "Reward Points", "Manufacturer", "Categories",
      "Filters", "Stores", "Downloads", "Related Products", "Meta Title"], ]
 
-with open('test.csv', 'w', newline='') as file:
+# name of new file
+with open('NCH.csv', 'w', newline='') as file:
     writer = csv.writer(file)
     writer.writerows(row_list)
 
-
 # This should be changed
-#manufacturer is supplier name
-#location is company name
-MANUFACTURER = "Chocopaz"
-location = "Rumidimur DMCC"
-si_tag = "R"
-date = "28/08/2023"
-
-
+# manufacturer is supplier name
+# location is company name
+# MANUFACTURER = "Gulf International"
+location = "NEW COUNTRY HEALTHCARE LLC"
+si_tag = "NCHNEW"
+date = "2023-11-06"
 
 # Name ✅
 # MODEL: si number ✅
@@ -47,12 +43,14 @@ names = read_csv.get_names()
 price = read_csv.get_prices()
 barcodes = read_csv.get_barcodes()
 meta_titles = read_csv.get_meta_titles()
-categories = read_csv.get_categories()
+categories = 250
 description = read_csv.get_des()
+brands = read_csv.get_brands()
+
 si_number = [f"{si_tag}{num:03}" for num in range(0, len(names))]
 sort_number = [num for num in range(0, len(names))]
 weights = read_csv.get_weights()
-TAX_CLASS = "Taxable Good"
+TAX_CLASS = "Taxable Goods"
 seo = [slugify(name) for name in names]
 
 # These should not be changed
@@ -60,20 +58,22 @@ QUANTITY = 100
 MIN_QUANTITY = 1
 SUBTRACT_STOCK = "Yes"
 STORE = 0
-# print(seo)
 index = 0
 last_number = names
 
-
-
 while index != len(names):
-    name_tw = names[index]
+    name_tw = unidecode(names[index])
     price_tw = price[index]
     barcode_tw = barcodes[index]
-    meta_title_tw = meta_titles[index]
+    image = f"catalog/2023/nch01/{barcode_tw}.jpg"
+    meta_title_tw = unidecode(meta_titles[index])
     si_number_tw = si_number[index]
     sort_number_tw = sort_number[index]
     seo_tw = seo[index]
+    try:
+        manu_f = brands[index]
+    except IndexError:
+        manu_f = ""
 
     if weights == "":
         weight_tw = ""
@@ -85,28 +85,23 @@ while index != len(names):
     else:
         barcode_tw = barcodes[index]
 
-    if categories == "":
-        category_tw = chatgpt.get_category(barcode_tw)
-    else:
-        category_tw = categories[index]
-
     if description == "":
-        description_tw = chatgpt.get_description(barcode_tw,name_tw)
+        description_tw = name_tw
     else:
         description_tw = description[index]
-
 
     lines = description_tw.split('\n')  # Split the sentence into lines using '\n' as the delimiter
     meta_tag_tw = '\n'.join(lines[:2])
 
-    f = open('test.csv', 'a')
+    # name of new file(same as above)
+    f = open('NCH.csv', 'a')
     writer = csv.writer(f)
-    row = ["", name_tw, si_number_tw, barcode_tw, description_tw, meta_tag_tw, " ", " ", "", "", "", "", "", price_tw,
-           location, "", TAX_CLASS,
-           QUANTITY, MIN_QUANTITY, "", SUBTRACT_STOCK, "", "", seo_tw, date, "", "", "", "", weight_tw, "",
+    row = ["", name_tw, si_number_tw, barcode_tw, description_tw, meta_tag_tw, name_tw, " ", "", "", "", "", "",
+           price_tw,
+           location, "Enabled", TAX_CLASS,
+           QUANTITY, MIN_QUANTITY, image, SUBTRACT_STOCK, "", "", seo_tw, date, "", "", "", "", weight_tw, "",
            sort_number_tw,
-           "", MANUFACTURER, category_tw, "", STORE, "", "", meta_title_tw]
+           "", manu_f, categories, "", STORE, "", "", meta_title_tw]
     writer.writerow(row)
     print(f"{name_tw} has been added to the csv")
     index += 1
-    time.sleep(2)

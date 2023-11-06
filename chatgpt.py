@@ -15,20 +15,9 @@ from selenium.webdriver.common.by import By
 
 
 
-# openai.api_key = "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"
-#
-#
-# def get_completion(prompt, model="gpt-3.5-turbo"):
-#     messages = [{"role": "user", "content": prompt}]
-#     response = openai.ChatCompletion.create(
-#         model=model,
-#         messages=messages,
-#         temperature=0,
-#     )
-#     return response.choices[0].message["content"]
-#
-#
-def get_description(id,name):
+
+def get_description(name):
+    time.sleep(3)
     chrome_options = webdriver.ChromeOptions()
 
     driver = webdriver.Chrome()
@@ -57,7 +46,9 @@ def get_description(id,name):
 
     except:
         des = name
-    return name
+    return des
+
+
 
 
 
@@ -72,7 +63,7 @@ def get_category(id):
         active_category = active_li.get_text()
         # print(active_category)
     else:
-        active_category = "Health care"
+        active_category = "to be added"
 
     return active_category
 

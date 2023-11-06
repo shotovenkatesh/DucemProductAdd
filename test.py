@@ -1,23 +1,11 @@
-import requests
+import pandas as pd
 
-# Replace with your API key
-api_key = "your_api_key_here"
+# Load the "cleaned_ef.csv" file into a DataFrame
+df = pd.read_csv('cleaned_ef.csv')
 
-# Barcode to search for
-barcode = "5010029204209"  # Replace with the barcode you want to search
+# Create a new column by concatenating "Name" and "Weight" columns
+df['Name_Weight'] = df['Name'] + ' ' + df['weight'].astype(str)
 
-# URL for the API endpoint
-url = f"https://api.ean-search.org/api?token={api_key}&op=barcode-lookup&ean={barcode}"
+# Save the modified data to the same or a new CSV file
+df.to_csv('cleaned_ef.csv', index=False)
 
-# Send an HTTP GET request to the API
-response = requests.get(url)
-
-# Parse the JSON response
-data = response.json()
-
-# Extract and print product information
-if data.get('status') == 'success':
-    product_info = data.get('product')
-    print("Product Description:", product_info.get('description', 'Description not available'))
-else:
-    print("Failed to fetch product information.")

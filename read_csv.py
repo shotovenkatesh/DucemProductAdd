@@ -2,12 +2,22 @@ import pandas as pd
 import csv
 
 
-df = pd.read_csv("life.csv")
+#name of the csv that has the data
+df = pd.read_csv("n.csv")
 # print(df)
+df['Name'] = df['Name'].astype(str)
 df['Name'] = df['Name'].str.title()
+try:
+    df['Brand'] = df['Brand'].astype(str)
+except:
+    print("Brand details is not available for this csv")
+else:
+    df['Brand'] = df['Brand'].str.title()
+
+
 df['Price'] = df['Price'].astype(float)
-increase_percentage = 20
-df['Price'] = df['Price'] * 1.25
+df['Price'] = df['Price'] * 1.35
+df['Price'] = df['Price'].round(1)
 
 # df['Description'] = df['Description'].str.title()
 
@@ -17,6 +27,17 @@ names = [item['Name'] for item in data_dict]
 price = [item['Price'] for item in data_dict]
 meta_titles = [item['Name'] for item in data_dict]
 
+try:
+    brands = [item['Brand'] for item in data_dict]
+except:
+    brands = []
+
+try:
+    brands = [item['Brand'] for item in data_dict]
+except KeyError:
+    brands = ""
+
+
 
 try:
     description = [item['Description'] for item in data_dict]
@@ -25,14 +46,13 @@ except KeyError:
 
 
 try:
-    barcodes = [item['Barcode'] for item in data_dict]
+    barcodes = [str(item['Barcode']) for item in data_dict]
+    barcodes = [s.rstrip('.0') if s.endswith('.0') else s for s in barcodes]
+    barcodes = [str(barcode).rstrip('.0') for barcode in barcodes]
 except KeyError:
     barcodes = ""
 
-try:
-    categories = [item['Category'] for item in data_dict]
-except KeyError:
-    categories = ""
+
 
 try:
     weights = [item['Weight'] for item in data_dict]
@@ -56,8 +76,7 @@ def get_meta_titles():
     return meta_titles
 
 
-def get_categories():
-    return categories
+
 
 
 def get_weights():
@@ -66,10 +85,11 @@ def get_weights():
 def get_des():
     return description
 
-#
-# print(names)
-# print(description)
-# print(price)
-# print(categories)
-# print(weights)
-# print(barcodes)
+
+def get_brands():
+    return brands
+
+print(price)
+print(barcodes)
+print(names)
+print(brands)
